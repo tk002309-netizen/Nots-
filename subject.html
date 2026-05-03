@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Subject — StudyVault</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#040d1a;--bg2:#071224;--card:#0b1929;--card2:#0f2035;
+  --border:#1a3a5c;--gold:#f0a500;--gold2:#ffd060;--blue:#1e90ff;
+  --teal:#00d4aa;--text:#e8f0fe;--muted:#7a9abf;--danger:#ff4b6e;
+  --sidebar:260px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+
+/* SIDEBAR (same) */
+.sidebar{width:var(--sidebar);min-height:100vh;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:.3s;}
+.sidebar-logo{padding:24px 20px 20px;font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;border-bottom:1px solid var(--border);}
+.sidebar-logo span{-webkit-text-fill-color:var(--blue);}
+.sidebar-user{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--blue));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#040d1a;flex-shrink:0;}
+.user-name{font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-email{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nav-section{padding:16px 12px 8px;font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 16px;margin:2px 8px;border-radius:12px;cursor:pointer;color:var(--muted);font-size:.9rem;font-weight:500;transition:.2s;text-decoration:none;}
+.nav-item:hover{background:var(--card2);color:var(--text);}
+.nav-item.active{background:var(--gold)18;color:var(--gold);font-weight:600;}
+.nav-item .icon{font-size:1.1rem;width:22px;text-align:center;}
+.sidebar-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border);}
+.btn-logout{width:100%;padding:10px;border-radius:10px;background:var(--danger)18;border:1px solid var(--danger)44;color:var(--danger);font-size:.88rem;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:.2s;}
+
+.main{margin-left:var(--sidebar);flex:1;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(4,13,26,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.4rem;cursor:pointer;padding:8px;}
+.content{padding:28px;flex:1;max-width:900px;}
+
+/* subject header */
+.subj-header{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:28px;
+}
+.subj-banner{
+  width:100%;height:160px;object-fit:cover;display:flex;align-items:center;justify-content:center;
+  font-size:4rem;background:linear-gradient(135deg,#0a2040,#071224);
+}
+.subj-header-info{padding:20px 24px;}
+.subj-header-info h1{font-size:1.3rem;font-weight:800;margin-bottom:8px;}
+.meta-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.badge{padding:4px 12px;border-radius:50px;font-size:.72rem;font-weight:700;}
+.free{background:var(--teal)22;color:var(--teal);border:1px solid var(--teal)44;}
+.paid{background:var(--gold)22;color:var(--gold);border:1px solid var(--gold)44;}
+
+/* Q&A list */
+.qa-list{display:flex;flex-direction:column;gap:12px;}
+.qa-item{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;
+  transition:.2s;
+}
+.qa-item:hover{border-color:var(--gold)44;}
+.qa-head{
+  display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;
+  user-select:none;
+}
+.qa-num{
+  width:28px;height:28px;border-radius:8px;flex-shrink:0;
+  background:var(--gold)20;border:1px solid var(--gold)44;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:800;color:var(--gold);
+}
+.qa-q{font-size:.92rem;font-weight:600;flex:1;line-height:1.5;}
+.qa-arrow{color:var(--muted);font-size:.9rem;transition:.3s;flex-shrink:0;}
+.qa-item.open .qa-arrow{transform:rotate(180deg);}
+.qa-answer{
+  max-height:0;overflow:hidden;transition:max-height .4s ease;
+  border-top:0 solid var(--border);
+}
+.qa-item.open .qa-answer{
+  max-height:2000px;
+  border-top:1px solid var(--border);
+}
+.qa-answer-inner{
+  padding:20px 24px;
+  font-size:.9rem;line-height:1.8;color:var(--text);
+  font-family:'Noto Sans Devanagari','Sora',sans-serif;
+  /* ANTI-COPY */
+  user-select:none;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  pointer-events:none;
+  position:relative;
+}
+/* WATERMARK inside answer */
+.qa-answer-inner::before{
+  content:attr(data-watermark);
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(1.5rem,6vw,3rem);
+  font-weight:900;
+  color:rgba(240,165,0,0.07);
+  transform:rotate(-20deg);
+  pointer-events:none;
+  white-space:nowrap;
+  overflow:hidden;
+  z-index:0;
+  letter-spacing:2px;
+}
+.qa-answer-inner *{position:relative;z-index:1;}
+
+/* Read full screen btn */
+.read-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 20px;border-radius:50px;
+  background:linear-gradient(135deg,var(--blue),#0066cc);
+  color:white;font-size:.85rem;font-weight:700;
+  border:none;cursor:pointer;font-family:'Sora',sans-serif;
+  pointer-events:all !important;
+  transition:.2s;margin-top:10px;
+}
+.read-btn:hover{opacity:.9;}
+
+/* LOCK CARD */
+.lock-card{
+  background:var(--card2);border:1px solid var(--gold)33;border-radius:14px;
+  padding:32px;text-align:center;margin-top:20px;
+}
+.lock-icon{font-size:3rem;margin-bottom:12px;}
+.lock-card h3{font-size:1.1rem;font-weight:700;margin-bottom:8px;}
+.lock-card p{color:var(--muted);font-size:.88rem;margin-bottom:20px;line-height:1.6;}
+.btn-buy-big{
+  padding:13px 28px;border-radius:50px;
+  background:linear-gradient(135deg,var(--gold),#e08800);
+  color:#040d1a;font-size:.95rem;font-weight:700;
+  border:none;cursor:pointer;font-family:'Sora',sans-serif;
+  box-shadow:0 0 24px var(--gold)33;transition:.2s;
+}
+.btn-buy-big:hover{opacity:.9;}
+
+/* FULL SCREEN READING MODE */
+#read-mode{
+  display:none;
+  position:fixed;inset:0;z-index:1000;
+  background:#000;
+  flex-direction:column;
+}
+#read-mode.active{display:flex;}
+#read-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;
+  background:#050e1e;border-bottom:1px solid #1a2a3a;
+  flex-shrink:0;
+}
+#read-topbar .title{font-size:.9rem;font-weight:700;color:var(--gold);}
+#read-controls{display:flex;gap:10px;align-items:center;}
+.ctrl-btn{
+  padding:7px 14px;border-radius:8px;
+  background:#0b1929;border:1px solid #1a3a5c;
+  color:var(--text);font-size:.8rem;font-weight:600;cursor:pointer;
+  font-family:'Sora',sans-serif;transition:.2s;
+}
+.ctrl-btn:hover{border-color:var(--gold)55;}
+.ctrl-btn.active{background:var(--gold)20;border-color:var(--gold);color:var(--gold);}
+#read-close{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--danger)20;border:1px solid var(--danger)44;
+  color:var(--danger);font-size:1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+#read-progress{
+  height:3px;background:var(--border);flex-shrink:0;
+}
+#read-progress-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));width:0;transition:.3s;}
+#read-body{
+  flex:1;overflow-y:auto;padding:40px 20px;
+  display:flex;flex-direction:column;align-items:center;
+}
+#read-body::-webkit-scrollbar{width:4px;}
+#read-body::-webkit-scrollbar-track{background:#050e1e;}
+#read-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.read-card{
+  width:100%;max-width:720px;
+  background:#060f1e;border:1px solid #1a2a3a;border-radius:16px;
+  margin-bottom:20px;overflow:hidden;
+  position:relative;
+}
+.read-card-head{
+  padding:14px 20px;background:#0a1829;
+  border-bottom:1px solid #1a2a3a;
+  display:flex;align-items:center;gap:10px;
+}
+.read-q-num{
+  width:24px;height:24px;border-radius:6px;
+  background:var(--gold)20;border:1px solid var(--gold)44;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:800;color:var(--gold);flex-shrink:0;
+}
+.read-q-text{font-size:.9rem;font-weight:600;color:var(--text);}
+.read-answer{
+  padding:20px 24px;
+  font-size:.92rem;line-height:1.9;
+  color:#cdd8ee;
+  font-family:'Noto Sans Devanagari','Sora',sans-serif;
+  /* ANTI COPY */
+  user-select:none;-webkit-user-select:none;-moz-user-select:none;
+  position:relative;overflow:hidden;
+}
+/* watermark in read mode */
+.read-answer::after{
+  content:attr(data-wm);
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%) rotate(-25deg);
+  font-size:clamp(1.2rem,5vw,2.5rem);
+  font-weight:900;
+  color:rgba(240,165,0,0.05);
+  white-space:nowrap;
+  pointer-events:none;
+  letter-spacing:3px;
+}
+/* answer rich text */
+.read-answer b,.qa-answer-inner b{color:var(--gold2);font-weight:700;}
+.read-answer ul,.qa-answer-inner ul{padding-left:20px;margin:8px 0;}
+.read-answer li,.qa-answer-inner li{margin-bottom:4px;}
+.read-answer h4,.qa-answer-inner h4{color:var(--blue);margin:12px 0 6px;}
+/* font size controls */
+#read-body.fs-sm .read-answer{font-size:.82rem;}
+#read-body.fs-lg .read-answer{font-size:1.05rem;}
+
+/* BUY MODAL */
+.modal-overlay{position:fixed;inset:0;background:#000000cc;z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;max-width:420px;width:100%;overflow:hidden;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.modal-head{background:linear-gradient(135deg,#0a2040,#071224);border-bottom:1px solid var(--border);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
+.modal-head h3{font-size:1rem;font-weight:700;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:4px;}
+.modal-body{padding:24px;}
+.contact-btns{display:flex;flex-direction:column;gap:10px;}
+.cbtn{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:12px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;font-family:'Sora',sans-serif;text-decoration:none;transition:.2s;}
+.cbtn:hover{opacity:.9;transform:translateX(3px);}
+.cbtn-wa{background:#25D36622;color:#25D366;border:1px solid #25D36655;}
+.cbtn-tg{background:#2AABEE22;color:#2AABEE;border:1px solid #2AABEE55;}
+.cbtn-ig{background:#E1306C22;color:#E1306C;border:1px solid #E1306C55;}
+
+.skeleton{background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);background-size:200%;animation:sh 1.4s infinite;border-radius:8px;}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:150;}
+@media(max-width:768px){
+  .sidebar{left:calc(-1 * var(--sidebar));}
+  .sidebar.open{left:0;}
+  .overlay.show{display:block;}
+  .main{margin-left:0;}
+  .hamburger{display:block;}
+  .content{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Anti-copy JS (global) -->
+<script>
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&['c','a','u','s','p','v'].includes(e.key.toLowerCase()))e.preventDefault();
+  if(e.key==='F12'||e.keyCode===123)e.preventDefault();
+  if(e.ctrlKey&&e.shiftKey&&['i','j','c'].includes(e.key.toLowerCase()))e.preventDefault();
+});
+// Devtools detect
+setInterval(()=>{
+  const t=document.getElementById('read-body')||document.getElementById('qa-list-container');
+  if(!t)return;
+  const threshold=200;
+  if(window.outerWidth-window.innerWidth>threshold||window.outerHeight-window.innerHeight>threshold){
+    t.style.filter='blur(12px)';
+  }else{t.style.filter='';}
+},1000);
+</script>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">Study<span>Vault</span></div>
+  <div class="sidebar-user">
+    <div class="avatar" id="avatar-init">S</div>
+    <div>
+      <div class="user-name" id="user-name">Loading...</div>
+      <div class="user-email" id="user-email">—</div>
+    </div>
+  </div>
+  <div class="nav-section">Main Menu</div>
+  <a class="nav-item" href="dashboard.html"><span class="icon">🏠</span>Dashboard</a>
+  <a class="nav-item active" href="subjects.html"><span class="icon">📚</span>All Subjects</a>
+  <a class="nav-item" href="my-subjects.html"><span class="icon">⭐</span>My Subjects</a>
+  <div class="nav-section">Account</div>
+  <a class="nav-item" href="profile.html"><span class="icon">👤</span>Profile</a>
+  <a class="nav-item" href="purchases.html"><span class="icon">🛍️</span>My Purchases</a>
+  <div class="sidebar-bottom">
+    <button class="btn-logout" id="logout-btn">🚪 Logout</button>
+  </div>
+</div>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <div style="font-size:.95rem;font-weight:700;" id="topbar-name">Subject</div>
+    <a href="subjects.html" style="font-size:.82rem;color:var(--muted);text-decoration:none;">← Back</a>
+  </div>
+
+  <div class="content">
+    <!-- Subject header -->
+    <div class="subj-header" id="subj-header">
+      <div class="skeleton" style="height:160px;border-radius:0;"></div>
+      <div class="subj-header-info">
+        <div class="skeleton" style="height:20px;width:60%;margin-bottom:10px;"></div>
+        <div class="skeleton" style="height:12px;width:40%;"></div>
+      </div>
+    </div>
+
+    <!-- Q&A or lock -->
+    <div id="qa-list-container"></div>
+  </div>
+</div>
+
+<!-- FULL SCREEN READ MODE -->
+<div id="read-mode">
+  <div id="read-topbar">
+    <div class="title" id="read-title">📖 Reading Mode</div>
+    <div id="read-controls">
+      <button class="ctrl-btn" onclick="setFontSize('sm')">A-</button>
+      <button class="ctrl-btn" onclick="setFontSize('md')">A</button>
+      <button class="ctrl-btn" onclick="setFontSize('lg')">A+</button>
+    </div>
+    <button id="read-close" onclick="closeReadMode()">✕</button>
+  </div>
+  <div id="read-progress"><div id="read-progress-bar"></div></div>
+  <div id="read-body"></div>
+</div>
+
+<!-- BUY MODAL -->
+<div class="modal-overlay" id="buy-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>🛍️ Subject Kharido</h3>
+      <button class="modal-close" onclick="closeBuyModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+        <div style="font-size:1.6rem;" id="m-emoji">📚</div>
+        <div><div style="font-weight:700;font-size:.95rem" id="m-name">—</div><div style="font-size:.75rem;color:var(--muted)" id="m-qs">—</div></div>
+        <div style="margin-left:auto;font-weight:800;color:var(--gold);font-size:1.1rem" id="m-price">—</div>
+      </div>
+      <p style="font-size:.83rem;color:var(--muted);margin-bottom:18px;line-height:1.6;">Neeche contact karo aur admin se subject access lelo. Auto-message ready hai! 🚀</p>
+      <div class="contact-btns" id="contact-btns"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import{getAuth,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import{getFirestore,doc,getDoc,collection,getDocs,query,orderBy}
+  from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const app=initializeApp({
+  apiKey:"AIzaSyDY0lVUA4Ph7wV1MciIE4ICv0Wkn06nHqY",
+  authDomain:"clash-code.firebaseapp.com",
+  projectId:"clash-code",
+  storageBucket:"clash-code.firebasestorage.app",
+  messagingSenderId:"167202813766",
+  appId:"1:167202813766:web:a2e16409f5b6d5ae569747"
+});
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+const params=new URLSearchParams(location.search);
+const subjectId=params.get('id');
+if(!subjectId)location.href='subjects.html';
+
+let currentUser=null;
+let userData={purchases:[]};
+let subjectData=null;
+let questions=[];
+let adminSettings={};
+let watermarkText='StudyVault';
+
+onAuthStateChanged(auth,async u=>{
+  if(!u){location.href='login.html';return;}
+  currentUser=u;
+  document.getElementById('avatar-init').textContent=(u.displayName||u.email).charAt(0).toUpperCase();
+  document.getElementById('user-name').textContent=u.displayName||'Student';
+  document.getElementById('user-email').textContent=u.email;
+  watermarkText=(u.displayName||u.email.split('@')[0])+'  •  StudyVault';
+  const[userSnap,subjSnap,settSnap,qSnap]=await Promise.all([
+    getDoc(doc(db,'users',u.uid)),
+    getDoc(doc(db,'subjects',subjectId)),
+    getDoc(doc(db,'settings','contact')),
+    getDocs(query(collection(db,'subjects',subjectId,'questions'),orderBy('order','asc')))
+  ]);
+  userData=userSnap.data()||{purchases:[]};
+  adminSettings=settSnap.data()||{};
+  if(adminSettings.watermark)watermarkText=adminSettings.watermark+' • '+watermarkText;
+  if(!subjSnap.exists()){document.getElementById('qa-list-container').innerHTML='<p style="color:var(--muted)">Subject nahi mila.</p>';return;}
+  subjectData={id:subjSnap.id,...subjSnap.data()};
+  questions=[];
+  qSnap.forEach(d=>questions.push({id:d.id,...d.data()}));
+  renderHeader();
+  renderContent();
+});
+
+function renderHeader(){
+  document.getElementById('topbar-name').textContent=subjectData.name;
+  document.getElementById('subj-header').innerHTML=`
+    ${subjectData.thumbnail
+      ?`<img src="${subjectData.thumbnail}" class="subj-banner" alt="${subjectData.name}"/>`
+      :`<div class="subj-banner" style="height:160px;">${subjectData.emoji||'📚'}</div>`}
+    <div class="subj-header-info">
+      <h1>${subjectData.name}</h1>
+      <div class="meta-row">
+        ${subjectData.isFree?`<span class="badge free">✓ Free</span>`:`<span class="badge paid">⭐ Premium — ₹${subjectData.price}</span>`}
+        <span style="font-size:.8rem;color:var(--muted)">${questions.length} Questions</span>
+      </div>
+      ${subjectData.description?`<p style="font-size:.85rem;color:var(--muted);margin-top:10px;line-height:1.6">${subjectData.description}</p>`:''}
+    </div>`;
+}
+
+function isOwned(){
+  return subjectData.isFree||(userData.purchases||[]).includes(subjectId);
+}
+
+function renderContent(){
+  const container=document.getElementById('qa-list-container');
+  if(!isOwned()){
+    // show 2 free preview + lock
+    const preview=questions.slice(0,Math.min(2,questions.length));
+    const previewHTML=preview.map((q,i)=>buildQACard(q,i+1,true)).join('');
+    container.innerHTML=`
+      ${previewHTML}
+      <div class="lock-card">
+        <div class="lock-icon">🔐</div>
+        <h3>Premium Content</h3>
+        <p>Baaki ${questions.length-preview.length} questions aur detailed answers dekhne ke liye subject khareedna hoga. Sirf ₹${subjectData.price} mein puri padhai!</p>
+        <button class="btn-buy-big" onclick="showBuyModal()">🛍️ Buy Now — ₹${subjectData.price}</button>
+      </div>`;
+    return;
+  }
+  if(!questions.length){
+    container.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">🔧 Admin abhi questions add kar raha hai. Thodi der baad check karo.</div>';
+    return;
+  }
+  container.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:.85rem;color:var(--muted)">${questions.length} Questions available</div>
+      <button onclick="openReadMode()" style="display:flex;align-items:center;gap:8px;padding:9px 18px;border-radius:50px;background:linear-gradient(135deg,var(--blue),#0066cc);color:white;font-size:.82rem;font-weight:700;border:none;cursor:pointer;font-family:'Sora',sans-serif;">
+        🖥️ Full Screen Mode
+      </button>
+    </div>
+    <div class="qa-list" id="qa-list">${questions.map((q,i)=>buildQACard(q,i+1,false)).join('')}</div>`;
+}
+
+function buildQACard(q,num,preview){
+  const wm=preview?'':watermarkText;
+  const answer=preview&&!q.freePreview
+    ?'<span style="color:var(--muted);font-style:italic">🔒 Yeh answer premium content hai. Subject khareedne ke baad dikhega.</span>'
+    :q.answer||'Answer jald aayega...';
+  return`<div class="qa-item" id="qa-${q.id}">
+    <div class="qa-head" onclick="toggleQA('${q.id}')">
+      <div class="qa-num">Q${num}</div>
+      <div class="qa-q">${q.question}</div>
+      <div class="qa-arrow">▼</div>
+    </div>
+    <div class="qa-answer">
+      <div class="qa-answer-inner" data-watermark="${wm}">${answer}</div>
+    </div>
+  </div>`;
+}
+
+window.toggleQA=function(id){
+  const el=document.getElementById('qa-'+id);
+  if(!el)return;
+  const wasOpen=el.classList.contains('open');
+  document.querySelectorAll('.qa-item.open').forEach(x=>x.classList.remove('open'));
+  if(!wasOpen)el.classList.add('open');
+};
+
+// READ MODE
+window.openReadMode=function(){
+  if(!questions.length)return;
+  const body=document.getElementById('read-body');
+  document.getElementById('read-title').textContent=`📖 ${subjectData.name}`;
+  body.innerHTML=questions.map((q,i)=>`
+    <div class="read-card">
+      <div class="read-card-head">
+        <div class="read-q-num">Q${i+1}</div>
+        <div class="read-q-text">${q.question}</div>
+      </div>
+      <div class="read-answer" data-wm="${watermarkText}">${q.answer||'Answer jald aayega...'}</div>
+    </div>`).join('');
+  document.getElementById('read-mode').classList.add('active');
+  document.body.style.overflow='hidden';
+  // progress
+  document.getElementById('read-body').addEventListener('scroll',updateProgress);
+};
+window.closeReadMode=function(){
+  document.getElementById('read-mode').classList.remove('active');
+  document.body.style.overflow='';
+};
+function updateProgress(){
+  const el=document.getElementById('read-body');
+  const pct=(el.scrollTop/(el.scrollHeight-el.clientHeight))*100;
+  document.getElementById('read-progress-bar').style.width=Math.min(100,pct)+'%';
+}
+window.setFontSize=function(sz){
+  const body=document.getElementById('read-body');
+  body.className='';if(sz!=='md')body.classList.add('fs-'+sz);
+  document.querySelectorAll('#read-controls .ctrl-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['sm','md','lg'][i]===sz);
+  });
+};
+
+// BUY MODAL
+window.showBuyModal=function(){
+  document.getElementById('m-emoji').textContent=subjectData.emoji||'📚';
+  document.getElementById('m-name').textContent=subjectData.name;
+  document.getElementById('m-qs').textContent=questions.length+' Questions';
+  document.getElementById('m-price').textContent='₹'+subjectData.price;
+  const userEmail=currentUser?.email||'';
+  const msg=`Hi! Main "${subjectData.name}" ke notes khareedna chahta/chahti hun. Price: ₹${subjectData.price}. Email: ${userEmail}`;
+  const btns=[];
+  if(adminSettings.whatsapp){
+    const n=adminSettings.whatsapp.replace(/\D/g,'');
+    btns.push(`<a class="cbtn cbtn-wa" href="https://wa.me/${n}?text=${encodeURIComponent(msg)}" target="_blank"><span style="font-size:1.2rem">💬</span>WhatsApp pe contact karo</a>`);
+  }
+  if(adminSettings.telegram){
+    btns.push(`<a class="cbtn cbtn-tg" href="https://t.me/${adminSettings.telegram.replace('@','')}" target="_blank"><span style="font-size:1.2rem">✈️</span>Telegram pe contact karo</a>`);
+  }
+  if(adminSettings.instagram){
+    btns.push(`<a class="cbtn cbtn-ig" href="https://instagram.com/${adminSettings.instagram.replace('@','')}" target="_blank"><span style="font-size:1.2rem">📸</span>Instagram pe contact karo</a>`);
+  }
+  if(!btns.length)btns.push('<p style="color:var(--muted);text-align:center;font-size:.85rem">Admin ne contact details nahi daali hain abhi.</p>');
+  document.getElementById('contact-btns').innerHTML=btns.join('');
+  document.getElementById('buy-modal').classList.add('show');
+};
+window.closeBuyModal=function(){document.getElementById('buy-modal').classList.remove('show');};
+document.getElementById('buy-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeBuyModal();});
+
+document.getElementById('logout-btn').onclick=async()=>{await signOut(auth);location.href='login.html';};
+window.toggleSidebar=function(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');};
+window.closeSidebar=function(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');};
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>My Subjects — StudyVault</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#040d1a;--bg2:#071224;--card:#0b1929;--card2:#0f2035;--border:#1a3a5c;--gold:#f0a500;--gold2:#ffd060;--blue:#1e90ff;--teal:#00d4aa;--text:#e8f0fe;--muted:#7a9abf;--danger:#ff4b6e;--sidebar:260px;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+.sidebar{width:var(--sidebar);min-height:100vh;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:.3s;}
+.sidebar-logo{padding:24px 20px 20px;font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;border-bottom:1px solid var(--border);}
+.sidebar-logo span{-webkit-text-fill-color:var(--blue);}
+.sidebar-user{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--blue));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#040d1a;flex-shrink:0;}
+.user-name{font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-email{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nav-section{padding:16px 12px 8px;font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 16px;margin:2px 8px;border-radius:12px;cursor:pointer;color:var(--muted);font-size:.9rem;font-weight:500;transition:.2s;text-decoration:none;}
+.nav-item:hover{background:var(--card2);color:var(--text);}
+.nav-item.active{background:var(--gold)18;color:var(--gold);font-weight:600;}
+.nav-item .icon{font-size:1.1rem;width:22px;text-align:center;}
+.sidebar-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border);}
+.btn-logout{width:100%;padding:10px;border-radius:10px;background:var(--danger)18;border:1px solid var(--danger)44;color:var(--danger);font-size:.88rem;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;}
+.main{margin-left:var(--sidebar);flex:1;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(4,13,26,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.4rem;cursor:pointer;padding:8px;}
+.content{padding:28px;flex:1;}
+.subjects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;}
+.subj-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:.3s;text-decoration:none;color:var(--text);}
+.subj-card:hover{border-color:var(--teal)55;transform:translateY(-4px);}
+.subj-thumb{width:100%;height:120px;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:var(--card2);}
+.subj-body{padding:14px;}
+.subj-name{font-size:.92rem;font-weight:700;margin-bottom:8px;}
+.badge{padding:3px 10px;border-radius:50px;font-size:.7rem;font-weight:700;}
+.free{background:var(--teal)22;color:var(--teal);border:1px solid var(--teal)44;}
+.owned{background:var(--blue)22;color:var(--blue);border:1px solid var(--blue)44;}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-icon{font-size:3.5rem;margin-bottom:16px;}
+.btn-browse{padding:12px 28px;border-radius:50px;background:linear-gradient(135deg,var(--gold),#e08800);color:#040d1a;font-size:.9rem;font-weight:700;border:none;cursor:pointer;font-family:'Sora',sans-serif;text-decoration:none;display:inline-block;margin-top:16px;}
+.skeleton{background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);background-size:200%;animation:sh 1.4s infinite;border-radius:8px;}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:150;}
+@media(max-width:768px){.sidebar{left:calc(-1 * var(--sidebar));}.sidebar.open{left:0;}.overlay.show{display:block;}.main{margin-left:0;}.hamburger{display:block;}.content{padding:16px;}}
+</style>
+</head>
+<body>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">Study<span>Vault</span></div>
+  <div class="sidebar-user">
+    <div class="avatar" id="avatar-init">S</div>
+    <div><div class="user-name" id="user-name">Loading...</div><div class="user-email" id="user-email">—</div></div>
+  </div>
+  <div class="nav-section">Main Menu</div>
+  <a class="nav-item" href="dashboard.html"><span class="icon">🏠</span>Dashboard</a>
+  <a class="nav-item" href="subjects.html"><span class="icon">📚</span>All Subjects</a>
+  <a class="nav-item active" href="my-subjects.html"><span class="icon">⭐</span>My Subjects</a>
+  <div class="nav-section">Account</div>
+  <a class="nav-item" href="profile.html"><span class="icon">👤</span>Profile</a>
+  <a class="nav-item" href="purchases.html"><span class="icon">🛍️</span>My Purchases</a>
+  <div class="sidebar-bottom"><button class="btn-logout" id="logout-btn">🚪 Logout</button></div>
+</div>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <div style="font-size:1rem;font-weight:700;">⭐ My Subjects</div>
+    <div></div>
+  </div>
+  <div class="content">
+    <div class="subjects-grid" id="grid">
+      <div class="skeleton" style="height:200px;"></div>
+      <div class="skeleton" style="height:200px;"></div>
+      <div class="skeleton" style="height:200px;"></div>
+    </div>
+  </div>
+</div>
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import{getAuth,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import{getFirestore,doc,getDoc,collection,getDocs}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+const app=initializeApp({apiKey:"AIzaSyDY0lVUA4Ph7wV1MciIE4ICv0Wkn06nHqY",authDomain:"clash-code.firebaseapp.com",projectId:"clash-code",storageBucket:"clash-code.firebasestorage.app",messagingSenderId:"167202813766",appId:"1:167202813766:web:a2e16409f5b6d5ae569747"});
+const auth=getAuth(app);const db=getFirestore(app);
+onAuthStateChanged(auth,async u=>{
+  if(!u){location.href='login.html';return;}
+  document.getElementById('avatar-init').textContent=(u.displayName||u.email).charAt(0).toUpperCase();
+  document.getElementById('user-name').textContent=u.displayName||'Student';
+  document.getElementById('user-email').textContent=u.email;
+  const[uSnap,sSnap]=await Promise.all([getDoc(doc(db,'users',u.uid)),getDocs(collection(db,'subjects'))]);
+  const purchases=uSnap.data()?.purchases||[];
+  const subjects=[];sSnap.forEach(d=>subjects.push({id:d.id,...d.data()}));
+  const mine=subjects.filter(s=>s.isFree||purchases.includes(s.id));
+  const grid=document.getElementById('grid');
+  if(!mine.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📭</div><h3 style="margin-bottom:8px">Koi subject nahi</h3><p>Abhi tak koi paid subject nahi kharida. Free subjects automatically yahan dikhenge.</p><a href="subjects.html" class="btn-browse">📚 Subjects Browse Karo</a></div>`;
+    return;
+  }
+  grid.innerHTML=mine.map(s=>`<a href="subject.html?id=${s.id}" class="subj-card">
+    ${s.thumbnail?`<img src="${s.thumbnail}" class="subj-thumb" alt="${s.name}"/>`:`<div class="subj-thumb">${s.emoji||'📚'}</div>`}
+    <div class="subj-body">
+      <div class="subj-name">${s.name}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        ${s.isFree?`<span class="badge free">✓ Free</span>`:`<span class="badge owned">✓ Purchased</span>`}
+        <span style="font-size:.75rem;color:var(--muted)">${s.questionCount||0} Qs</span>
+      </div>
+    </div>
+  </a>`).join('');
+});
+document.getElementById('logout-btn').onclick=async()=>{await signOut(auth);location.href='login.html';};
+window.toggleSidebar=function(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');};
+window.closeSidebar=function(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');};
+</script>
+</body>
+</html>

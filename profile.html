@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Profile — StudyVault</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#040d1a;--bg2:#071224;--card:#0b1929;--card2:#0f2035;--border:#1a3a5c;--gold:#f0a500;--gold2:#ffd060;--blue:#1e90ff;--teal:#00d4aa;--text:#e8f0fe;--muted:#7a9abf;--danger:#ff4b6e;--sidebar:260px;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+.sidebar{width:var(--sidebar);min-height:100vh;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:.3s;}
+.sidebar-logo{padding:24px 20px 20px;font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;border-bottom:1px solid var(--border);}
+.sidebar-logo span{-webkit-text-fill-color:var(--blue);}
+.sidebar-user{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);}
+.avatar-sm{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--blue));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#040d1a;flex-shrink:0;}
+.user-name{font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-email-sm{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nav-section{padding:16px 12px 8px;font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 16px;margin:2px 8px;border-radius:12px;cursor:pointer;color:var(--muted);font-size:.9rem;font-weight:500;transition:.2s;text-decoration:none;}
+.nav-item:hover{background:var(--card2);color:var(--text);}
+.nav-item.active{background:var(--gold)18;color:var(--gold);font-weight:600;}
+.nav-item .icon{font-size:1.1rem;width:22px;text-align:center;}
+.sidebar-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border);}
+.btn-logout{width:100%;padding:10px;border-radius:10px;background:var(--danger)18;border:1px solid var(--danger)44;color:var(--danger);font-size:.88rem;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;}
+.main{margin-left:var(--sidebar);flex:1;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(4,13,26,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.4rem;cursor:pointer;padding:8px;}
+.content{padding:28px;flex:1;max-width:600px;}
+/* profile card */
+.profile-card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:24px;}
+.profile-banner{height:100px;background:linear-gradient(135deg,#0a2a4a,#071224,#0a1e38);}
+.profile-info{padding:0 24px 24px;margin-top:-40px;}
+.big-avatar{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;font-weight:800;color:#040d1a;
+  border:4px solid var(--card);margin-bottom:12px;
+  overflow:hidden;
+}
+.big-avatar img{width:100%;height:100%;object-fit:cover;}
+.profile-name{font-size:1.2rem;font-weight:800;margin-bottom:4px;}
+.profile-email{font-size:.85rem;color:var(--muted);margin-bottom:16px;}
+.profile-stats{display:flex;gap:24px;}
+.pstat{text-align:center;}
+.pstat-num{font-size:1.3rem;font-weight:800;color:var(--gold);}
+.pstat-lbl{font-size:.72rem;color:var(--muted);}
+/* edit form */
+.edit-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:20px;}
+.edit-card h3{font-size:.95rem;font-weight:700;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:6px;font-weight:600;}
+.field input{width:100%;padding:12px 14px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-size:.9rem;font-family:'Sora',sans-serif;outline:none;transition:.2s;}
+.field input:focus{border-color:var(--gold)88;}
+.field input:disabled{opacity:.5;cursor:not-allowed;}
+.btn-save{padding:11px 24px;border-radius:50px;background:linear-gradient(135deg,var(--gold),#e08800);color:#040d1a;font-size:.88rem;font-weight:700;border:none;cursor:pointer;font-family:'Sora',sans-serif;transition:.2s;}
+.btn-save:hover{opacity:.9;}
+.msg{padding:10px 14px;border-radius:10px;font-size:.83rem;margin-top:12px;display:none;}
+.msg.success{background:var(--teal)22;color:var(--teal);border:1px solid var(--teal)44;display:block;}
+.msg.error{background:var(--danger)22;color:var(--danger);border:1px solid var(--danger)44;display:block;}
+.overlay{display:none;position:fixed;inset:0;background:#00000088;z-index:150;}
+@media(max-width:768px){.sidebar{left:calc(-1 * var(--sidebar));}.sidebar.open{left:0;}.overlay.show{display:block;}.main{margin-left:0;}.hamburger{display:block;}.content{padding:16px;}}
+</style>
+</head>
+<body>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">Study<span>Vault</span></div>
+  <div class="sidebar-user">
+    <div class="avatar-sm" id="avatar-init">S</div>
+    <div><div class="user-name" id="user-name-s">Loading...</div><div class="user-email-sm" id="user-email-s">—</div></div>
+  </div>
+  <div class="nav-section">Main Menu</div>
+  <a class="nav-item" href="dashboard.html"><span class="icon">🏠</span>Dashboard</a>
+  <a class="nav-item" href="subjects.html"><span class="icon">📚</span>All Subjects</a>
+  <a class="nav-item" href="my-subjects.html"><span class="icon">⭐</span>My Subjects</a>
+  <div class="nav-section">Account</div>
+  <a class="nav-item active" href="profile.html"><span class="icon">👤</span>Profile</a>
+  <a class="nav-item" href="purchases.html"><span class="icon">🛍️</span>My Purchases</a>
+  <div class="sidebar-bottom"><button class="btn-logout" id="logout-btn">🚪 Logout</button></div>
+</div>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <div style="font-size:1rem;font-weight:700;">👤 My Profile</div>
+    <div></div>
+  </div>
+  <div class="content">
+    <div class="profile-card">
+      <div class="profile-banner"></div>
+      <div class="profile-info">
+        <div class="big-avatar" id="big-avatar">S</div>
+        <div class="profile-name" id="p-name">—</div>
+        <div class="profile-email" id="p-email">—</div>
+        <div class="profile-stats">
+          <div class="pstat"><div class="pstat-num" id="p-purchased">0</div><div class="pstat-lbl">Purchased</div></div>
+          <div class="pstat"><div class="pstat-num" id="p-free">0</div><div class="pstat-lbl">Free Access</div></div>
+          <div class="pstat"><div class="pstat-num" id="p-joined">—</div><div class="pstat-lbl">Member Since</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="edit-card">
+      <h3>✏️ Edit Profile</h3>
+      <div class="field"><label>Full Name</label><input type="text" id="edit-name" placeholder="Your Name"/></div>
+      <div class="field"><label>Email (change nahi ho sakta)</label><input type="email" id="edit-email" disabled/></div>
+      <div class="field"><label>New Password (khali chodo agar change nahi karna)</label><input type="password" id="edit-pass" placeholder="New password..."/></div>
+      <button class="btn-save" onclick="saveProfile()">💾 Save Changes</button>
+      <div class="msg" id="profile-msg"></div>
+    </div>
+  </div>
+</div>
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import{getAuth,onAuthStateChanged,signOut,updateProfile,updatePassword}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import{getFirestore,doc,getDoc,setDoc,collection,getDocs,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+const app=initializeApp({apiKey:"AIzaSyDY0lVUA4Ph7wV1MciIE4ICv0Wkn06nHqY",authDomain:"clash-code.firebaseapp.com",projectId:"clash-code",storageBucket:"clash-code.firebasestorage.app",messagingSenderId:"167202813766",appId:"1:167202813766:web:a2e16409f5b6d5ae569747"});
+const auth=getAuth(app);const db=getFirestore(app);
+let cu=null;
+onAuthStateChanged(auth,async u=>{
+  if(!u){location.href='login.html';return;}
+  cu=u;
+  const init=(u.displayName||u.email).charAt(0).toUpperCase();
+  document.getElementById('avatar-init').textContent=init;
+  document.getElementById('user-name-s').textContent=u.displayName||'Student';
+  document.getElementById('user-email-s').textContent=u.email;
+  document.getElementById('big-avatar').textContent=init;
+  document.getElementById('p-name').textContent=u.displayName||'Student';
+  document.getElementById('p-email').textContent=u.email;
+  document.getElementById('edit-name').value=u.displayName||'';
+  document.getElementById('edit-email').value=u.email;
+  const[uSnap,sSnap]=await Promise.all([getDoc(doc(db,'users',u.uid)),getDocs(collection(db,'subjects'))]);
+  const userData=uSnap.data()||{};
+  const purchases=userData.purchases||[];
+  const freeCount=[];sSnap.forEach(d=>{if(d.data().isFree)freeCount.push(d.id);});
+  document.getElementById('p-purchased').textContent=purchases.length;
+  document.getElementById('p-free').textContent=freeCount.length;
+  if(userData.joinedAt?.toDate){
+    document.getElementById('p-joined').textContent=userData.joinedAt.toDate().toLocaleDateString('hi-IN',{month:'short',year:'numeric'});
+  }
+});
+window.saveProfile=async function(){
+  const name=document.getElementById('edit-name').value.trim();
+  const pass=document.getElementById('edit-pass').value;
+  const msg=document.getElementById('profile-msg');
+  msg.className='msg';msg.textContent='';
+  try{
+    if(name&&name!==cu.displayName){
+      await updateProfile(cu,{displayName:name});
+      await setDoc(doc(db,'users',cu.uid),{name},{merge:true});
+      document.getElementById('p-name').textContent=name;
+      document.getElementById('big-avatar').textContent=name.charAt(0).toUpperCase();
+    }
+    if(pass){
+      if(pass.length<6){msg.className='msg error';msg.textContent='Password 6+ characters ka ho.';return;}
+      await updatePassword(cu,pass);
+    }
+    msg.className='msg success';msg.textContent='✓ Profile update ho gaya!';
+    document.getElementById('edit-pass').value='';
+  }catch(e){
+    msg.className='msg error';
+    msg.textContent=e.code==='auth/requires-recent-login'?'Security ke liye pehle logout karke dobara login karo.':'Kuch galat hua. Dobara try karo.';
+  }
+};
+document.getElementById('logout-btn').onclick=async()=>{await signOut(auth);location.href='login.html';};
+window.toggleSidebar=function(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');};
+window.closeSidebar=function(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');};
+</script>
+</body>
+</html>

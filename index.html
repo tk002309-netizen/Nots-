@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>StudyVault — Smart Notes Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#040d1a;
+  --bg2:#071224;
+  --card:#0b1929;
+  --card2:#0f2035;
+  --border:#1a3a5c;
+  --gold:#f0a500;
+  --gold2:#ffd060;
+  --blue:#1e90ff;
+  --teal:#00d4aa;
+  --text:#e8f0fe;
+  --muted:#7a9abf;
+  --danger:#ff4b6e;
+  --radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Sora',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* BG mesh */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%,#0a2a4a55 0%,transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%,#0a1e3a44 0%,transparent 55%),
+    radial-gradient(ellipse 40% 30% at 60% 30%,#f0a50008 0%,transparent 50%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── NAVBAR ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 5vw;height:64px;
+  background:rgba(4,13,26,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-size:1.3rem;font-weight:800;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-0.5px;
+}
+.nav-logo span{color:var(--blue);-webkit-text-fill-color:var(--blue);}
+.nav-links{display:flex;gap:24px;align-items:center;}
+.nav-links a{
+  color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:500;
+  transition:.2s;
+}
+.nav-links a:hover{color:var(--text);}
+.btn-nav{
+  padding:8px 20px;border-radius:50px;
+  background:linear-gradient(135deg,var(--gold),#e08800);
+  color:#040d1a;font-weight:700;font-size:.85rem;
+  border:none;cursor:pointer;text-decoration:none;
+  transition:.2s;
+}
+.btn-nav:hover{opacity:.9;transform:translateY(-1px);}
+
+/* ── HERO ── */
+.hero{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:100px 5vw 60px;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;border-radius:50px;
+  border:1px solid var(--gold)44;
+  background:var(--gold)11;
+  color:var(--gold);font-size:.8rem;font-weight:600;
+  margin-bottom:28px;letter-spacing:.5px;
+}
+.hero-badge::before{content:'✦';font-size:.7rem;}
+.hero h1{
+  font-size:clamp(2.2rem,7vw,4.5rem);
+  font-weight:800;line-height:1.1;
+  margin-bottom:24px;letter-spacing:-1px;
+}
+.hero h1 .grad{
+  background:linear-gradient(135deg,var(--gold),var(--gold2),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero p{
+  font-size:clamp(1rem,2.5vw,1.2rem);
+  color:var(--muted);max-width:580px;line-height:1.7;margin-bottom:40px;
+}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+.btn-primary{
+  padding:14px 32px;border-radius:50px;
+  background:linear-gradient(135deg,var(--gold),#e08800);
+  color:#040d1a;font-weight:700;font-size:1rem;
+  border:none;cursor:pointer;text-decoration:none;
+  box-shadow:0 0 30px var(--gold)44;
+  transition:.25s;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 40px var(--gold)66;}
+.btn-secondary{
+  padding:14px 32px;border-radius:50px;
+  background:transparent;
+  border:1.5px solid var(--border);
+  color:var(--text);font-weight:600;font-size:1rem;
+  cursor:pointer;text-decoration:none;transition:.25s;
+}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold);}
+
+/* stats row */
+.hero-stats{
+  display:flex;gap:40px;margin-top:60px;flex-wrap:wrap;justify-content:center;
+}
+.stat{text-align:center;}
+.stat-num{
+  font-size:1.8rem;font-weight:800;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-label{font-size:.8rem;color:var(--muted);margin-top:4px;}
+
+/* ── SECTIONS ── */
+section{position:relative;z-index:1;padding:80px 5vw;}
+.section-tag{
+  font-size:.8rem;font-weight:700;letter-spacing:2px;
+  color:var(--gold);text-transform:uppercase;margin-bottom:12px;
+}
+.section-title{
+  font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;
+  letter-spacing:-0.5px;margin-bottom:40px;
+}
+.section-title span{
+  background:linear-gradient(135deg,var(--gold),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+/* ── FEATURES ── */
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
+.feat-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:28px;
+  transition:.3s;
+}
+.feat-card:hover{border-color:var(--gold)66;transform:translateY(-4px);}
+.feat-icon{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;margin-bottom:16px;
+  background:linear-gradient(135deg,var(--gold)22,var(--gold)11);
+  border:1px solid var(--gold)33;
+}
+.feat-card h3{font-size:1rem;font-weight:700;margin-bottom:8px;}
+.feat-card p{font-size:.88rem;color:var(--muted);line-height:1.6;}
+
+/* ── SUBJECTS PREVIEW ── */
+.subjects-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:20px;
+}
+.subj-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;cursor:pointer;
+  transition:.3s;text-decoration:none;color:var(--text);
+  display:flex;flex-direction:column;
+}
+.subj-card:hover{border-color:var(--gold)66;transform:translateY(-4px);}
+.subj-thumb{
+  width:100%;aspect-ratio:16/9;object-fit:cover;
+  background:linear-gradient(135deg,var(--card2),var(--bg2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;
+}
+.subj-info{padding:16px;}
+.subj-name{font-size:.95rem;font-weight:700;margin-bottom:6px;}
+.subj-meta{display:flex;align-items:center;justify-content:space-between;}
+.badge-free{
+  padding:3px 10px;border-radius:50px;font-size:.72rem;font-weight:700;
+  background:#00d4aa22;color:var(--teal);border:1px solid var(--teal)44;
+}
+.badge-paid{
+  padding:3px 10px;border-radius:50px;font-size:.72rem;font-weight:700;
+  background:var(--gold)22;color:var(--gold);border:1px solid var(--gold)44;
+}
+.subj-price{font-size:.9rem;font-weight:700;color:var(--gold);}
+.subj-qs{font-size:.78rem;color:var(--muted);}
+/* loading skeleton */
+.skeleton{
+  background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
+  border-radius:8px;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+  padding:40px 5vw;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+footer .logo{
+  font-weight:800;font-size:1.1rem;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+footer p{color:var(--muted);font-size:.82rem;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  background:var(--card);border:1px solid var(--border);
+  padding:14px 20px;border-radius:12px;
+  font-size:.88rem;max-width:300px;
+  box-shadow:0 8px 32px #000a;
+  transform:translateY(80px);opacity:0;
+  transition:.3s;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-color:var(--teal)66;}
+.toast.error{border-color:var(--danger)66;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .nav-links{display:none;}
+  .hero-stats{gap:24px;}
+  footer{flex-direction:column;text-align:center;}
+}
+
+/* scroll fade-in */
+.reveal{opacity:0;transform:translateY(30px);transition:.6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">Study<span>Vault</span></div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#subjects">Subjects</a>
+    <a href="subjects.html">Browse All</a>
+  </div>
+  <a href="login.html" class="btn-nav">Login / Signup</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">India's Smart Notes Platform</div>
+  <h1>Padho Smart,<br/><span class="grad">Score Higher</span></h1>
+  <p>Expert-curated Q&A notes for every subject. Free aur Paid dono available. Full-screen distraction-free reading mode ke saath.</p>
+  <div class="hero-btns">
+    <a href="login.html" class="btn-primary">🚀 Get Started Free</a>
+    <a href="#subjects" class="btn-secondary">📚 Browse Subjects</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num" id="stat-students">—</div>
+      <div class="stat-label">Students Enrolled</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-subjects">—</div>
+      <div class="stat-label">Subjects Available</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="stat-questions">—</div>
+      <div class="stat-label">Q&A Notes</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-tag">Why StudyVault</div>
+  <div class="section-title">Kya kya milega <span>tumhe?</span></div>
+  <div class="features-grid reveal">
+    <div class="feat-card">
+      <div class="feat-icon">📖</div>
+      <h3>Expert Q&A Notes</h3>
+      <p>Har subject ke important questions aur detailed answers — exam-ready format mein.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🖥️</div>
+      <h3>Full-Screen Reading Mode</h3>
+      <p>Zero distraction mode — sirf padhai, koi aur cheez nahi. Eyes-friendly dark theme.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🆓</div>
+      <h3>Free + Paid Both</h3>
+      <p>Bahut saare subjects bilkul free. Premium subjects bhi bahut affordable price pe.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔒</div>
+      <h3>Secure Content</h3>
+      <p>Copy-protected notes. Watermark protection. Tumhara paisa waste nahi hoga.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📱</div>
+      <h3>Mobile Friendly</h3>
+      <p>Phone, tablet, laptop — sab pe perfectly kaam karta hai.</p>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
+      <h3>Instant Access</h3>
+      <p>Buy karo, immediately access milega. Koi wait nahi, koi delay nahi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SUBJECTS PREVIEW -->
+<section id="subjects" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="section-tag">Explore</div>
+  <div class="section-title">Popular <span>Subjects</span></div>
+  <div class="subjects-grid reveal" id="subjects-grid">
+    <!-- loaded from Firebase -->
+    <div class="subj-card" style="pointer-events:none;">
+      <div class="subj-thumb skeleton" style="height:120px;border-radius:0;"></div>
+      <div class="subj-info"><div class="skeleton" style="height:14px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:10px;width:40%;"></div></div>
+    </div>
+    <div class="subj-card" style="pointer-events:none;">
+      <div class="subj-thumb skeleton" style="height:120px;border-radius:0;"></div>
+      <div class="subj-info"><div class="skeleton" style="height:14px;width:60%;margin-bottom:10px;"></div><div class="skeleton" style="height:10px;width:35%;"></div></div>
+    </div>
+    <div class="subj-card" style="pointer-events:none;">
+      <div class="subj-thumb skeleton" style="height:120px;border-radius:0;"></div>
+      <div class="subj-info"><div class="skeleton" style="height:14px;width:75%;margin-bottom:10px;"></div><div class="skeleton" style="height:10px;width:45%;"></div></div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:36px;">
+    <a href="subjects.html" class="btn-primary">View All Subjects →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">StudyVault</div>
+  <p>© 2025 StudyVault. Smart padhai, smart results.</p>
+  <p style="color:var(--muted);font-size:.8rem;">Made with ❤️ for Indian Students</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import{getFirestore,collection,getDocs,query,orderBy,limit}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig={
+  apiKey:"AIzaSyDY0lVUA4Ph7wV1MciIE4ICv0Wkn06nHqY",
+  authDomain:"clash-code.firebaseapp.com",
+  databaseURL:"https://clash-code-default-rtdb.firebaseio.com",
+  projectId:"clash-code",
+  storageBucket:"clash-code.firebasestorage.app",
+  messagingSenderId:"167202813766",
+  appId:"1:167202813766:web:a2e16409f5b6d5ae569747"
+};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+// Load stats + subjects
+async function loadData(){
+  try{
+    const [subjSnap,userSnap]=await Promise.all([
+      getDocs(collection(db,'subjects')),
+      getDocs(collection(db,'users'))
+    ]);
+    const subjects=[];
+    let totalQ=0;
+    subjSnap.forEach(d=>{
+      const s={id:d.id,...d.data()};
+      subjects.push(s);
+      totalQ+=(s.questionCount||0);
+    });
+    // stats
+    document.getElementById('stat-students').textContent=animateNum(userSnap.size);
+    document.getElementById('stat-subjects').textContent=animateNum(subjects.length);
+    document.getElementById('stat-questions').textContent=animateNum(totalQ);
+    // render subjects (top 6)
+    renderSubjects(subjects.slice(0,6));
+  }catch(e){
+    console.log(e);
+    document.getElementById('subjects-grid').innerHTML=`<p style="color:var(--muted);grid-column:1/-1;text-align:center;">Subjects load ho rahe hain...</p>`;
+  }
+}
+
+function animateNum(target){
+  // just return with + for large
+  if(target===0)return'0';
+  return target>999?(target/1000).toFixed(1)+'K+':target+'+';
+}
+
+function renderSubjects(subjects){
+  const grid=document.getElementById('subjects-grid');
+  if(!subjects.length){
+    grid.innerHTML='<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:40px;">Abhi koi subject nahi hai. Admin se contact karo.</p>';
+    return;
+  }
+  grid.innerHTML=subjects.map(s=>`
+    <a href="subjects.html#${s.id}" class="subj-card">
+      ${s.thumbnail
+        ?`<img src="${s.thumbnail}" class="subj-thumb" alt="${s.name}" style="height:130px;object-fit:cover;width:100%;"/>`
+        :`<div class="subj-thumb" style="height:130px;font-size:2.5rem;">${s.emoji||'📚'}</div>`
+      }
+      <div class="subj-info">
+        <div class="subj-name">${s.name}</div>
+        <div class="subj-meta">
+          ${s.isFree
+            ?`<span class="badge-free">✓ Free</span>`
+            :`<span class="badge-paid">★ Premium</span>`
+          }
+          <span class="subj-price">${s.isFree?'Free':'₹'+s.price}</span>
+        </div>
+        <div class="subj-qs" style="margin-top:6px;">${s.questionCount||0} Questions</div>
+      </div>
+    </a>
+  `).join('');
+}
+
+loadData();
+
+// Scroll reveal
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+</script>
+</body>
+</html>
